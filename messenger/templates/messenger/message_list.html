@@ -1,0 +1,21 @@
+<!-- messenger/templates/messenger/message_list.html -->
+
+{% extends 'messenger/base.html' %}
+
+{% block title %}Message List{% endblock %}
+
+{% block content %}
+<h1>Message List</h1>
+<ul>
+    {% for message in messages %}
+        <li>
+            <strong>From:</strong> {{ message.sender.username }}<br>
+            <strong>To:</strong> {{ message.recipient.username }}<br>
+            <strong>Content:</strong> {{ message.content }}<br>
+            <strong>Time:</strong> {{ message.timestamp }}
+        </li>
+    {% empty %}
+        <li>No messages available.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

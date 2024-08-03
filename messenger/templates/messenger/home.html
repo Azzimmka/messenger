@@ -1,0 +1,16 @@
+<!-- messenger/templates/messenger/home.html -->
+
+{% extends 'messenger/base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h1>Welcome to Web Messenger</h1>
+<p>Select an option:</p>
+<ul>
+    <li><a href="{% url 'contact_list' %}">Contact List</a></li>
+    <li><a href="{% url 'message_list' %}">Messages</a></li>
+    <li><a href="{% url 'send_message' %}">Send Message</a></li>
+    <li><a href="{% url 'add_contact' %}">Add Contact</a></li>
+</ul>
+{% endblock %}

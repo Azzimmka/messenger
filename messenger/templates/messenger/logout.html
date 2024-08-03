@@ -1,0 +1,10 @@
+<!-- messenger/templates/messenger/logout.html -->
+
+{% extends 'messenger/base.html' %}
+
+{% block title %}Logout{% endblock %}
+
+{% block content %}
+<h1>Logout</h1>
+<p>You have been logged out. <a href="{% url 'login' %}">Login again?</a></p>
+{% endblock %}

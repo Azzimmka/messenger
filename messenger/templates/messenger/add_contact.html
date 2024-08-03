@@ -1,0 +1,19 @@
+<!-- messenger/templates/messenger/add_contact.html -->
+
+{% extends 'messenger/base.html' %}
+
+{% block title %}Add Contact{% endblock %}
+
+{% block content %}
+<h1>Add Contact</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Add</button>
+</form>
+{% endblock %}
+
+
+
+<!-- messenger/templates/messenger/add_contact.html -->
+
