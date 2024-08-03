@@ -93,7 +93,3 @@ def logout(request):
         return redirect('home')
     return HttpResponseNotAllowed(['POST'])
 
-
-def all_contact(request):
-    users = Contact.objects.all()
-    return render(request, 'messenger/all_contact.html', {'users': users})

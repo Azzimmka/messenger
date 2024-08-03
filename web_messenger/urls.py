@@ -19,11 +19,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth.views import LoginView
-from messenger.views import register
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', LoginView.as_view(template_name='messenger/login.html'), name='login'),
-    path('register/', register, name='register'),
     path('', include('messenger.urls')),
 ]
