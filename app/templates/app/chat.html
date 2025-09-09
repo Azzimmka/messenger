@@ -27,16 +27,19 @@
         <!-- Contacts List -->
         <div class="contacts-list">
             {% for contact_info in contacts_with_info %}
-                <a href="?contact_id={{ contact_info.contact.contact_user.id }}" 
-                   class="contact-item {% if contact_info.contact.contact_user.id == active_contact.id %}active{% endif %}">
+                <a href="?contact_id={{ contact_info.user.id }}" 
+                   class="contact-item {% if contact_info.user.id == active_contact.id %}active{% endif %}">
                     <div class="contact-avatar">
-                        {{ contact_info.contact.contact_user.userprofile.avatar_emoji }}
+                        {{ contact_info.user.userprofile.avatar_emoji }}
                     </div>
                     <div class="contact-info">
                         <div class="contact-name">
-                            {{ contact_info.contact.contact_user.userprofile.nickname }}
-                            {% if contact_info.contact.contact_user.userprofile.is_online %}
+                            {{ contact_info.user.userprofile.nickname }}
+                            {% if contact_info.user.userprofile.is_online %}
                                 <span class="online-indicator"></span>
+                            {% endif %}
+                            {% if not contact_info.is_explicit_contact %}
+                                <span style="font-size: 0.7rem; opacity: 0.7;">(conversation)</span>
                             {% endif %}
                         </div>
                         <div class="contact-last-message">
@@ -144,6 +147,18 @@ document.addEventListener('DOMContentLoaded', function() {
     if (messagesContainer) {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
+    
+    // Close mobile sidebar when contact is selected
+    const contactItems = document.querySelectorAll('.contact-item');
+    contactItems.forEach(item => {
+        item.addEventListener('click', () => {
+            if (window.messenger && window.innerWidth <= 768) {
+                setTimeout(() => {
+                    window.messenger.closeMobileSidebar();
+                }, 100);
+            }
+        });
+    });
 });
 </script>
 {% endblock %}

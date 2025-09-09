@@ -5,6 +5,9 @@ class Messenger {
         this.messageInput = null;
         this.sendButton = null;
         this.refreshInterval = null;
+        this.lastMessageCount = 0;
+        this.notificationSound = null;
+        this.hasNotificationPermission = false;
         
         this.init();
     }
@@ -15,6 +18,9 @@ class Messenger {
         this.initContactSelection();
         this.initAutoRefresh();
         this.initSendMessage();
+        this.initNotifications();
+        this.initMobileFeatures();
+        this.initSoundNotification();
     }
     
     initTheme() {
@@ -127,8 +133,157 @@ class Messenger {
         }
     }
     
+    initNotifications() {
+        // Request notification permission
+        if ('Notification' in window) {
+            if (Notification.permission === 'default') {
+                this.showNotificationPermissionBar();
+            } else if (Notification.permission === 'granted') {
+                this.hasNotificationPermission = true;
+            }
+        }
+    }
+    
+    showNotificationPermissionBar() {
+        const permissionBar = document.createElement('div');
+        permissionBar.className = 'notification-permission';
+        permissionBar.innerHTML = `
+            📱 Enable notifications to get alerted when new messages arrive
+            <button onclick="window.messenger.requestNotificationPermission()">Enable</button>
+            <button onclick="this.parentElement.remove()" style="background: transparent; color: white; border: 1px solid white;">Not now</button>
+        `;
+        document.body.appendChild(permissionBar);
+    }
+    
+    requestNotificationPermission() {
+        Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+                this.hasNotificationPermission = true;
+                document.querySelector('.notification-permission')?.remove();
+                showNotification('Notifications enabled! 🔔', 'success');
+            }
+        });
+    }
+    
+    initSoundNotification() {
+        // Create a simple notification sound using Web Audio API
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            this.createNotificationSound(audioContext);
+        } catch (e) {
+            console.log('Web Audio API not supported, using fallback');
+            // Fallback: create audio element with data URI
+            this.notificationSound = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAaAA==');
+        }
+    }
+    
+    createNotificationSound(audioContext) {
+        // Simple beep sound
+        this.notificationSound = {
+            play: () => {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 800;
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.1);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            }
+        };
+    }
+    
+    initMobileFeatures() {
+        // Add overlay for mobile sidebar
+        if (window.innerWidth <= 768) {
+            const overlay = document.createElement('div');
+            overlay.className = 'sidebar-overlay';
+            overlay.addEventListener('click', () => this.closeMobileSidebar());
+            document.body.appendChild(overlay);
+        }
+        
+        // Prevent zoom on iOS when focusing input
+        const messageInput = document.querySelector('.message-input');
+        if (messageInput && /iPad|iPhone|iPod/.test(navigator.userAgent)) {
+            messageInput.style.fontSize = '16px';
+        }
+    }
+    
+    toggleMobileSidebar() {
+        const sidebar = document.querySelector('.chat-sidebar');
+        const overlay = document.querySelector('.sidebar-overlay');
+        const toggle = document.querySelector('.mobile-menu-btn');
+        
+        if (sidebar && sidebar.classList.contains('open')) {
+            this.closeMobileSidebar();
+        } else if (sidebar) {
+            sidebar.classList.add('open');
+            if (overlay) overlay.classList.add('active');
+            if (toggle) toggle.innerHTML = '<i class="fas fa-times"></i>';
+        }
+    }
+    
+    closeMobileSidebar() {
+        const sidebar = document.querySelector('.chat-sidebar');
+        const overlay = document.querySelector('.sidebar-overlay');
+        const toggle = document.querySelector('.mobile-menu-btn');
+        
+        if (sidebar) sidebar.classList.remove('open');
+        if (overlay) overlay.classList.remove('active');
+        if (toggle) toggle.innerHTML = '<i class="fas fa-bars"></i>';
+    }
+    
+    playNotificationSound() {
+        if (this.notificationSound) {
+            try {
+                this.notificationSound.play();
+            } catch (e) {
+                console.log('Could not play notification sound:', e);
+            }
+        }
+    }
+    
+    showDesktopNotification(message) {
+        if (this.hasNotificationPermission && document.hidden) {
+            const notification = new Notification('New Message', {
+                body: message.content,
+                icon: '📱',
+                badge: '💬',
+                tag: 'messenger-' + message.sender
+            });
+            
+            notification.onclick = () => {
+                window.focus();
+                notification.close();
+            };
+            
+            // Auto-close after 5 seconds
+            setTimeout(() => notification.close(), 5000);
+        }
+    }
+    
     updateMessagesDisplay(messages) {
         const currentMessages = this.messagesContainer.querySelectorAll('.message');
+        
+        // Check for new messages and play sound/show notification
+        if (messages.length > this.lastMessageCount && this.lastMessageCount > 0) {
+            const newMessages = messages.slice(this.lastMessageCount);
+            newMessages.forEach(msg => {
+                if (!msg.is_mine) {
+                    this.playNotificationSound();
+                    this.showDesktopNotification(msg);
+                }
+            });
+        }
+        
+        this.lastMessageCount = messages.length;
         
         // Only update if message count has changed
         if (messages.length !== currentMessages.length) {
@@ -336,8 +491,18 @@ document.addEventListener('click', (e) => {
 // Handle window resize
 window.addEventListener('resize', () => {
     const sidebar = document.querySelector('.chat-sidebar');
-    if (sidebar && window.innerWidth > 768) {
-        sidebar.classList.remove('open');
+    const overlay = document.querySelector('.sidebar-overlay');
+    const toggle = document.querySelector('.mobile-menu-toggle');
+    
+    if (window.innerWidth > 768) {
+        if (sidebar) sidebar.classList.remove('open');
+        if (overlay) overlay.classList.remove('active');
+        if (toggle) toggle.innerHTML = '<i class="fas fa-bars"></i>';
+    }
+    
+    // Re-initialize mobile features if window size changes significantly
+    if (window.messenger && !toggle && window.innerWidth <= 768) {
+        window.messenger.initMobileFeatures();
     }
 });
 

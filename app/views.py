@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.http import JsonResponse
 from django.db.models import Q, Max
+from django.utils import timezone
 from .models import Message, Contact, UserProfile
 from .forms import SimpleRegistrationForm, SimpleLoginForm, MessageForm, ProfileUpdateForm
 
@@ -86,21 +87,48 @@ def chat(request):
             receiver=request.user,
             status='sent'
         ).update(status='read')
+        
+        # Auto-add contact if not already added and there are messages between them
+        if conversation.exists():
+            Contact.objects.get_or_create(
+                user=request.user,
+                contact_user=active_contact
+            )
     
     # Handle new message
     if request.method == 'POST':
         content = request.POST.get('content', '').strip()
         if content and active_contact:
+            # Create the message
             Message.objects.create(
                 sender=request.user,
                 receiver=active_contact,
                 content=content
             )
+            # Auto-add contact for both users if not already added
+            Contact.objects.get_or_create(
+                user=request.user,
+                contact_user=active_contact
+            )
+            Contact.objects.get_or_create(
+                user=active_contact,
+                contact_user=request.user
+            )
             return redirect(f'/chat/?contact_id={contact_id}')
     
-    # Get contacts with last message info
+    # Get all users who have had conversations with current user (for contact list)
+    conversation_users = User.objects.filter(
+        Q(sent_messages__receiver=request.user) |
+        Q(received_messages__sender=request.user)
+    ).exclude(id=request.user.id).distinct().select_related('userprofile')
+    
+    # Combine explicit contacts with conversation partners
+    all_contact_users = set()
     contacts_with_info = []
+    
+    # Add explicit contacts
     for contact in contacts:
+        all_contact_users.add(contact.contact_user.id)
         last_message = Message.objects.filter(
             Q(sender=request.user, receiver=contact.contact_user) |
             Q(sender=contact.contact_user, receiver=request.user)
@@ -114,9 +142,39 @@ def chat(request):
         
         contacts_with_info.append({
             'contact': contact,
+            'user': contact.contact_user,
             'last_message': last_message,
-            'unread_count': unread_count
+            'unread_count': unread_count,
+            'is_explicit_contact': True
         })
+    
+    # Add conversation partners who aren't explicit contacts
+    for user in conversation_users:
+        if user.id not in all_contact_users:
+            last_message = Message.objects.filter(
+                Q(sender=request.user, receiver=user) |
+                Q(sender=user, receiver=request.user)
+            ).order_by('-timestamp').first()
+            
+            unread_count = Message.objects.filter(
+                sender=user,
+                receiver=request.user,
+                status='sent'
+            ).count()
+            
+            contacts_with_info.append({
+                'contact': None,
+                'user': user,
+                'last_message': last_message,
+                'unread_count': unread_count,
+                'is_explicit_contact': False
+            })
+    
+    # Sort by last message timestamp
+    contacts_with_info.sort(
+        key=lambda x: x['last_message'].timestamp if x['last_message'] else timezone.now() - timezone.timedelta(days=365),
+        reverse=True
+    )
     
     return render(request, 'app/chat.html', {
         'contacts_with_info': contacts_with_info,
