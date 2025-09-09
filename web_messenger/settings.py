@@ -25,7 +25,14 @@ SECRET_KEY = 'django-insecure-*jqia40aqbm$h*2r^%=w)uog-0rp1ev9*=73*s)3ym+_jn6r#x
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS - include all common hosts
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '.onrender.com',
+    'messenger-by-azim.onrender.com',
+    '*',  # Allow all for now
+]
 
 
 # Application definition
@@ -148,9 +155,12 @@ if 'DATABASE_URL' in os.environ:
     import dj_database_url
     DATABASES['default'] = dj_database_url.parse(os.environ['DATABASE_URL'])
     
-if os.environ.get('DJANGO_ENV') == 'production':
+# Production environment detection
+if (os.environ.get('DJANGO_ENV') == 'production' or 
+    'onrender.com' in os.environ.get('RENDER_EXTERNAL_URL', '') or
+    'DATABASE_URL' in os.environ):
     DEBUG = False
-    ALLOWED_HOSTS = ['*']  # Allow all hosts for now, will restrict later
+    print("🚀 PRODUCTION MODE DETECTED")
     
     # Security settings for production
     SECURE_BROWSER_XSS_FILTER = True
