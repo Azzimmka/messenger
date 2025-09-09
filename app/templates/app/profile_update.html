@@ -1,0 +1,52 @@
+{% extends "app/base_modern.html" %}
+
+{% block title %}Update Profile - Messenger{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1>Update Profile</h1>
+            <p>Customize your messenger profile</p>
+        </div>
+        
+        {% if form.errors %}
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <div class="alert alert-error">{{ error }}</div>
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="id_nickname">Nickname</label>
+                {{ form.nickname }}
+                <small>This is how others will see you in chats</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="id_avatar_emoji">Avatar Emoji</label>
+                {{ form.avatar_emoji }}
+                <small>Choose an emoji that represents you</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="id_theme_preference">Theme Preference</label>
+                {{ form.theme_preference }}
+            </div>
+            
+            <button type="submit" class="btn-primary">
+                <i class="fas fa-save"></i>
+                Update Profile
+            </button>
+        </form>
+        
+        <div class="auth-footer">
+            <a href="{% url 'chat' %}">← Back to Chat</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

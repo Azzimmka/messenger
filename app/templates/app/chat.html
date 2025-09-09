@@ -1,0 +1,149 @@
+{% extends "app/base_modern.html" %}
+
+{% block title %}Chat - Messenger{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+    <!-- Sidebar with contacts -->
+    <div class="chat-sidebar">
+        <div class="sidebar-header">
+            <h3>Chats</h3>
+            
+            <!-- Add Contact Form -->
+            <form class="add-contact-form" method="post" action="{% url 'add_contact' %}">
+                {% csrf_token %}
+                <select name="contact_user" required>
+                    <option value="">Add new contact...</option>
+                    {% for user in all_users %}
+                        <option value="{{ user.id }}">{{ user.userprofile.nickname }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </form>
+        </div>
+        
+        <!-- Contacts List -->
+        <div class="contacts-list">
+            {% for contact_info in contacts_with_info %}
+                <a href="?contact_id={{ contact_info.contact.contact_user.id }}" 
+                   class="contact-item {% if contact_info.contact.contact_user.id == active_contact.id %}active{% endif %}">
+                    <div class="contact-avatar">
+                        {{ contact_info.contact.contact_user.userprofile.avatar_emoji }}
+                    </div>
+                    <div class="contact-info">
+                        <div class="contact-name">
+                            {{ contact_info.contact.contact_user.userprofile.nickname }}
+                            {% if contact_info.contact.contact_user.userprofile.is_online %}
+                                <span class="online-indicator"></span>
+                            {% endif %}
+                        </div>
+                        <div class="contact-last-message">
+                            {% if contact_info.last_message %}
+                                {% if contact_info.last_message.sender == user %}You: {% endif %}
+                                {{ contact_info.last_message.content|truncatechars:30 }}
+                            {% else %}
+                                No messages yet
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="contact-meta">
+                        {% if contact_info.last_message %}
+                            <div class="message-time">{{ contact_info.last_message.timestamp|date:"H:i" }}</div>
+                        {% endif %}
+                        {% if contact_info.unread_count > 0 %}
+                            <div class="unread-count">{{ contact_info.unread_count }}</div>
+                        {% endif %}
+                    </div>
+                </a>
+            {% empty %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">👥</div>
+                    <h4>No contacts yet</h4>
+                    <p>Add someone to start chatting!</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Main Chat Area -->
+    <div class="chat-main">
+        {% if active_contact %}
+            <!-- Chat Header -->
+            <div class="chat-header">
+                <div class="chat-header-avatar">{{ active_contact.userprofile.avatar_emoji }}</div>
+                <div class="chat-header-info">
+                    <h3>{{ active_contact.userprofile.nickname }}</h3>
+                    <div class="chat-header-status">
+                        {% if active_contact.userprofile.is_online %}
+                            <i class="fas fa-circle" style="color: var(--success-color);"></i> Online
+                        {% else %}
+                            Last seen {{ active_contact.userprofile.last_seen|timesince }} ago
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Messages Container -->
+            <div class="messages-container" id="messages-container">
+                {% for message in conversation %}
+                    <div class="message {% if message.sender == user %}sent{% else %}received{% endif %}">
+                        <div class="message-bubble">
+                            <p class="message-content">{{ message.content }}</p>
+                            <div class="message-time">
+                                {{ message.timestamp|date:"H:i" }}
+                                {% if message.sender == user %}
+                                    <span class="message-status">
+                                        {% if message.status == 'read' %}
+                                            <i class="fas fa-check-double" style="color: var(--primary-color);"></i>
+                                        {% elif message.status == 'delivered' %}
+                                            <i class="fas fa-check-double"></i>
+                                        {% else %}
+                                            <i class="fas fa-check"></i>
+                                        {% endif %}
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Message Input -->
+            <div class="message-input-container">
+                <form class="message-input-form" method="post">
+                    {% csrf_token %}
+                    <textarea 
+                        name="content" 
+                        class="message-input" 
+                        placeholder="Type a message..." 
+                        rows="1"
+                        required
+                    ></textarea>
+                    <button type="submit" class="send-button" disabled>
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        {% else %}
+            <!-- Empty State -->
+            <div class="empty-state">
+                <div class="empty-state-icon">💬</div>
+                <h3>Welcome to Messenger!</h3>
+                <p>Select a contact to start chatting, or add a new contact to begin.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+// Auto-scroll to bottom when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    const messagesContainer = document.getElementById('messages-container');
+    if (messagesContainer) {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+});
+</script>
+{% endblock %}

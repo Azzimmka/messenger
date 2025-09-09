@@ -1,0 +1,83 @@
+{% extends "app/base_modern.html" %}
+{% load static %}
+
+{% block title %}Join Messenger{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1>Join Messenger</h1>
+            <p>Create your account in seconds</p>
+        </div>
+        
+        {% if form.errors %}
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <div class="alert alert-error">{{ error }}</div>
+                {% endfor %}
+            {% endfor %}
+            {% if form.non_field_errors %}
+                {% for error in form.non_field_errors %}
+                    <div class="alert alert-error">{{ error }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endif %}
+        
+        <form method="post" autocomplete="off">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="id_nickname">Choose your nickname</label>
+                {{ form.nickname }}
+                <small>This is how others will see you in chats</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="id_avatar_emoji">Pick your avatar emoji</label>
+                {{ form.avatar_emoji }}
+                <small>Choose an emoji that represents you</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="id_password">Create a password</label>
+                {{ form.password }}
+                <small>Make it simple but secure</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="id_confirm_password">Confirm password</label>
+                {{ form.confirm_password }}
+            </div>
+            
+            <button type="submit" class="btn-primary">
+                <i class="fas fa-user-plus"></i>
+                Create Account
+            </button>
+        </form>
+        
+        <div class="auth-footer">
+            Already have an account? <a href="{% url 'login' %}">Sign in here</a>
+        </div>
+    </div>
+</div>
+
+<script>
+// Random emoji generator
+document.addEventListener('DOMContentLoaded', function() {
+    const emojiInput = document.getElementById('id_avatar_emoji');
+    const emojis = ['😀', '😎', '🥰', '😍', '🤔', '😊', '🙂', '😇', '🤗', '🥳', '🤩', '😋', '🤪', '😜', '🧐', '🤓'];
+    
+    if (emojiInput && !emojiInput.value) {
+        emojiInput.value = emojis[Math.floor(Math.random() * emojis.length)];
+    }
+    
+    // Click to get random emoji
+    emojiInput.addEventListener('click', function() {
+        if (this.selectionStart === this.selectionEnd) {
+            this.value = emojis[Math.floor(Math.random() * emojis.length)];
+        }
+    });
+});
+</script>
+{% endblock %}

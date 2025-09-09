@@ -1,43 +1,42 @@
-<!-- messenger/templates/messenger/home.html -->
-{% extends "app/base.html" %}
+{% extends "app/base_modern.html" %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Welcome to Messenger{% endblock %}
 
 {% block content %}
-<style>
-    body {
-        background: linear-gradient(to right, #a6c0fe, #f68084);
-    }
-    .jumbotron-custom {
-        background: linear-gradient(to right, #a6c0fe, #f68084);
-        color: white;
-        padding: 50px 30px;
-        border-radius: 80px;
-        margin-top: 100px;
-    }
-    .jumbotron-custom h1 {
-        font-size: 3em;
-        font-weight: bold;
-    }
-    .jumbotron-custom p.lead {
-        font-size: 1.5em;
-        margin-bottom: 30px;
-    }
-    .btn-custom-primary {
-        background-color: #2575fc;
-        border-color: #2575fc;
-    }
-    .btn-custom-secondary {
-        background-color: #6a11cb;
-        border-color: #6a11cb;
-    }
-</style>
-<div class="jumbotron jumbotron-custom text-center">
-    <h1 class="display-4">Добро пожаловать Web Messenger</h1>
-    <p class="lead">Общайтесь с друзьями и семьей.</p>
-    <hr class="my-4">
-    <p>Если у вас уже есть учетная запись, пожалуйста, войдите в систему. Если нет, смело зарегистрируйтесь.</p>
-    <a class="btn btn-custom-primary btn-lg text-white" href="{% url 'login' %}" role="button">Log In</a>
-    <a class="btn btn-custom-secondary btn-lg text-white" href="{% url 'register' %}" role="button">Register</a>
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1>💬 Welcome to Messenger</h1>
+            <p>Connect with friends and family instantly</p>
+        </div>
+        
+        <div style="text-align: center; padding: 2rem 0;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🚀</div>
+            
+            <h3>Start Chatting Now!</h3>
+            <p>Join thousands of users already connected on our platform.</p>
+            
+            <div style="background: var(--hover-color); padding: 1.5rem; border-radius: 8px; margin: 1.5rem 0;">
+                <h4>✨ Features:</h4>
+                <ul style="text-align: left; display: inline-block;">
+                    <li>Real-time messaging</li>
+                    <li>Dark & Light themes</li>
+                    <li>Simple & fast registration</li>
+                    <li>Modern, clean interface</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+            <a href="{% url 'register' %}" class="btn-primary" style="flex: 1; text-align: center; text-decoration: none; padding: 1rem;">
+                <i class="fas fa-user-plus"></i>
+                Join Now
+            </a>
+            <a href="{% url 'login' %}" class="btn-primary" style="flex: 1; text-align: center; text-decoration: none; padding: 1rem; background: var(--text-secondary);">
+                <i class="fas fa-sign-in-alt"></i>
+                Sign In
+            </a>
+        </div>
+    </div>
 </div>
 {% endblock %}

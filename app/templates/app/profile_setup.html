@@ -1,0 +1,41 @@
+{% extends "app/base_modern.html" %}
+
+{% block title %}Welcome to Messenger{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1>🎉 Welcome, {{ user.userprofile.nickname }}!</h1>
+            <p>Your account has been created successfully</p>
+        </div>
+        
+        <div style="text-align: center; padding: 2rem 0;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">
+                {{ user.userprofile.avatar_emoji }}
+            </div>
+            
+            <h3>You're all set!</h3>
+            <p>You can now start chatting with people. Add contacts and begin conversations.</p>
+            
+            <div style="background: var(--hover-color); padding: 1.5rem; border-radius: 8px; margin: 1.5rem 0;">
+                <h4>Quick Tips:</h4>
+                <ul style="text-align: left; display: inline-block;">
+                    <li>Add contacts by selecting them from the dropdown</li>
+                    <li>Click on a contact to start chatting</li>
+                    <li>Use the theme toggle to switch between light and dark mode</li>
+                    <li>Your nickname is how others will see you</li>
+                </ul>
+            </div>
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn-primary">
+                <i class="fas fa-comments"></i>
+                Start Chatting
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

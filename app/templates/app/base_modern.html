@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Messenger{% endblock %}</title>
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    {% load static %}
+    <link href="{% static 'app/css/messenger.css' %}" rel="stylesheet">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% if user.is_authenticated %}
+        <header class="messenger-header">
+            <h1>
+                <i class="fas fa-comments"></i>
+                Messenger
+            </h1>
+            
+            <div class="header-actions">
+                <button class="theme-toggle" title="Toggle dark/light theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                
+                <div class="user-info">
+                    <div class="user-avatar">{{ user.userprofile.avatar_emoji }}</div>
+                    <span>{{ user.userprofile.nickname }}</span>
+                    <a href="{% url 'logout' %}" class="btn btn-sm" style="margin-left: 1rem; color: white;">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </a>
+                </div>
+            </div>
+        </header>
+    {% endif %}
+    
+    <!-- Messages (alerts) -->
+    {% if messages %}
+        <div class="alerts-container">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    {% block content %}{% endblock %}
+    
+    <!-- JavaScript -->
+    <script src="{% static 'app/js/messenger.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
