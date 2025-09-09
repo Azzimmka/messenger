@@ -150,7 +150,12 @@ if 'DATABASE_URL' in os.environ:
     
 if os.environ.get('DJANGO_ENV') == 'production':
     DEBUG = False
-    ALLOWED_HOSTS = ['*']  # Update this with your domain when you have one
+    ALLOWED_HOSTS = [
+        '.onrender.com',
+        'messenger-by-azim.onrender.com',
+        'localhost',
+        '127.0.0.1',
+    ]
     
     # Security settings for production
     SECURE_BROWSER_XSS_FILTER = True
