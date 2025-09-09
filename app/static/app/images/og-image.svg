@@ -1,0 +1,21 @@
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4f46e5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3730a3;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <rect width="1200" height="630" fill="url(#gradient)"/>
+  
+  <!-- Background decorative circles -->
+  <circle cx="1100" cy="100" r="100" fill="rgba(255,255,255,0.1)"/>
+  <circle cx="100" cy="530" r="150" fill="rgba(255,255,255,0.1)"/>
+  <circle cx="1050" cy="400" r="50" fill="rgba(255,255,255,0.1)"/>
+  
+  <!-- Main content -->
+  <text x="600" y="280" text-anchor="middle" font-family="Arial, sans-serif" font-size="120" fill="white">💬</text>
+  <text x="600" y="360" text-anchor="middle" font-family="Arial, sans-serif" font-size="64" font-weight="bold" fill="white">Web Messenger</text>
+  <text x="600" y="420" text-anchor="middle" font-family="Arial, sans-serif" font-size="32" fill="rgba(255,255,255,0.9)">Modern Chat Platform</text>
+  <text x="600" y="480" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" fill="rgba(255,255,255,0.8)">✨ Mobile-First Design • 🚀 Real-time Chat • 🎨 Themes</text>
+</svg>

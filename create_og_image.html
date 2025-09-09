@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1200px;
+            height: 630px;
+            background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container {
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+        
+        .logo {
+            font-size: 120px;
+            line-height: 1;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 64px;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            font-size: 32px;
+            font-weight: 400;
+            opacity: 0.9;
+            margin: 0;
+        }
+        
+        .features {
+            font-size: 24px;
+            opacity: 0.8;
+            margin-top: 20px;
+        }
+        
+        /* Background decoration */
+        .bg-decoration {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+            z-index: 1;
+        }
+        
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .circle1 {
+            width: 200px;
+            height: 200px;
+            top: -100px;
+            right: -100px;
+        }
+        
+        .circle2 {
+            width: 300px;
+            height: 300px;
+            bottom: -150px;
+            left: -150px;
+        }
+        
+        .circle3 {
+            width: 100px;
+            height: 100px;
+            top: 50%;
+            right: 10%;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-decoration">
+        <div class="circle circle1"></div>
+        <div class="circle circle2"></div>
+        <div class="circle circle3"></div>
+    </div>
+    
+    <div class="container">
+        <div class="logo">💬</div>
+        <h1>Web Messenger</h1>
+        <div class="subtitle">Modern Chat Platform</div>
+        <div class="features">
+            ✨ Mobile-First Design • 🚀 Real-time Chat • 🎨 Dark/Light Themes
+        </div>
+    </div>
+</body>
+</html>
