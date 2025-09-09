@@ -8,6 +8,8 @@ class Messenger {
         this.lastMessageCount = 0;
         this.notificationSound = null;
         this.hasNotificationPermission = false;
+        this.isMobile = window.innerWidth <= 768;
+        this.mobileState = 'contacts'; // 'contacts' or 'chat'
         
         this.init();
     }
@@ -21,6 +23,42 @@ class Messenger {
         this.initNotifications();
         this.initMobileFeatures();
         this.initSoundNotification();
+        this.initMobileState();
+    }
+    
+    // MOBILE STATE MANAGEMENT - TELEGRAM STYLE
+    initMobileState() {
+        if (!this.isMobile) return;
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const contactId = urlParams.get('contact_id');
+        
+        if (contactId) {
+            this.showChatScreen();
+        } else {
+            this.showContactsScreen();
+        }
+    }
+    
+    showContactsScreen() {
+        if (!this.isMobile) return;
+        
+        console.log('📱 Showing contacts screen');
+        this.mobileState = 'contacts';
+        document.body.classList.remove('mobile-chat-active');
+        
+        // Update URL without contact_id
+        const url = new URL(window.location);
+        url.searchParams.delete('contact_id');
+        window.history.replaceState({}, '', url);
+    }
+    
+    showChatScreen() {
+        if (!this.isMobile) return;
+        
+        console.log('💬 Showing chat screen');
+        this.mobileState = 'chat';
+        document.body.classList.add('mobile-chat-active');
     }
     
     initTheme() {
@@ -90,10 +128,28 @@ class Messenger {
             }
             
             item.addEventListener('click', (e) => {
-                // Remove active class from all contacts
-                contactItems.forEach(c => c.classList.remove('active'));
-                // Add active class to clicked contact
-                item.classList.add('active');
+                if (this.isMobile) {
+                    // In mobile, show chat screen immediately
+                    e.preventDefault();
+                    
+                    const href = item.getAttribute('href');
+                    const contactId = href.split('contact_id=')[1];
+                    
+                    // Update URL
+                    const url = new URL(window.location);
+                    url.searchParams.set('contact_id', contactId);
+                    window.history.pushState({}, '', url);
+                    
+                    // Show chat screen
+                    this.showChatScreen();
+                    
+                    // Navigate to the chat
+                    window.location.href = href;
+                } else {
+                    // Desktop behavior
+                    contactItems.forEach(c => c.classList.remove('active'));
+                    item.classList.add('active');
+                }
             });
         });
     }
@@ -201,13 +257,14 @@ class Messenger {
     }
     
     initMobileFeatures() {
-        // Add overlay for mobile sidebar
-        if (window.innerWidth <= 768) {
-            const overlay = document.createElement('div');
+        // Add overlay for mobile sidebar if it doesn't exist
+        let overlay = document.querySelector('.sidebar-overlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
             overlay.className = 'sidebar-overlay';
-            overlay.addEventListener('click', () => this.closeMobileSidebar());
             document.body.appendChild(overlay);
         }
+        overlay.addEventListener('click', () => this.closeMobileSidebar());
         
         // Prevent zoom on iOS when focusing input
         const messageInput = document.querySelector('.message-input');
@@ -216,28 +273,22 @@ class Messenger {
         }
     }
     
+    // MOBILE NAVIGATION - TELEGRAM STYLE
     toggleMobileSidebar() {
-        const sidebar = document.querySelector('.chat-sidebar');
-        const overlay = document.querySelector('.sidebar-overlay');
-        const toggle = document.querySelector('.mobile-menu-btn');
-        
-        if (sidebar && sidebar.classList.contains('open')) {
-            this.closeMobileSidebar();
-        } else if (sidebar) {
-            sidebar.classList.add('open');
-            if (overlay) overlay.classList.add('active');
-            if (toggle) toggle.innerHTML = '<i class="fas fa-times"></i>';
-        }
+        // This function is no longer needed in new architecture
+        // But keeping for compatibility
     }
     
     closeMobileSidebar() {
-        const sidebar = document.querySelector('.chat-sidebar');
-        const overlay = document.querySelector('.sidebar-overlay');
-        const toggle = document.querySelector('.mobile-menu-btn');
-        
-        if (sidebar) sidebar.classList.remove('open');
-        if (overlay) overlay.classList.remove('active');
-        if (toggle) toggle.innerHTML = '<i class="fas fa-bars"></i>';
+        // This function is no longer needed in new architecture
+        // But keeping for compatibility
+    }
+    
+    // Mobile back button - go back to contacts list
+    goBackToContacts() {
+        if (this.isMobile) {
+            this.showContactsScreen();
+        }
     }
     
     playNotificationSound() {
@@ -476,33 +527,44 @@ function toggleSidebar() {
     }
 }
 
+// Global function for mobile back button
+function goBackToContacts() {
+    if (window.messenger) {
+        window.messenger.goBackToContacts();
+    }
+}
+
 // Add click outside to close sidebar on mobile
 document.addEventListener('click', (e) => {
     const sidebar = document.querySelector('.chat-sidebar');
-    const toggleButton = document.querySelector('.sidebar-toggle');
+    const toggleButton = document.querySelector('.mobile-menu-btn');
+    const overlay = document.querySelector('.sidebar-overlay');
     
-    if (sidebar && window.innerWidth <= 768) {
+    if (sidebar && window.innerWidth <= 768 && sidebar.classList.contains('mobile-open')) {
         if (!sidebar.contains(e.target) && !toggleButton?.contains(e.target)) {
-            sidebar.classList.remove('open');
+            sidebar.classList.remove('mobile-open');
+            if (overlay) overlay.classList.remove('active');
         }
     }
 });
 
 // Handle window resize
 window.addEventListener('resize', () => {
-    const sidebar = document.querySelector('.chat-sidebar');
-    const overlay = document.querySelector('.sidebar-overlay');
-    const toggle = document.querySelector('.mobile-menu-toggle');
+    const wasMobile = window.messenger ? window.messenger.isMobile : false;
+    const isMobileNow = window.innerWidth <= 768;
     
-    if (window.innerWidth > 768) {
-        if (sidebar) sidebar.classList.remove('open');
-        if (overlay) overlay.classList.remove('active');
-        if (toggle) toggle.innerHTML = '<i class="fas fa-bars"></i>';
-    }
-    
-    // Re-initialize mobile features if window size changes significantly
-    if (window.messenger && !toggle && window.innerWidth <= 768) {
-        window.messenger.initMobileFeatures();
+    if (window.messenger) {
+        window.messenger.isMobile = isMobileNow;
+        
+        if (wasMobile !== isMobileNow) {
+            // Screen size category changed, reinitialize
+            if (isMobileNow) {
+                window.messenger.initMobileState();
+            } else {
+                // Reset to desktop mode
+                document.body.classList.remove('mobile-chat-active');
+            }
+        }
     }
 });
 

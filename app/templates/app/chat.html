@@ -75,6 +75,11 @@
         {% if active_contact %}
             <!-- Chat Header -->
             <div class="chat-header">
+                <!-- Mobile Back Button -->
+                <button class="mobile-back-btn" onclick="goBackToContacts()" title="Back to contacts">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                
                 <div class="chat-header-avatar">{{ active_contact.userprofile.avatar_emoji }}</div>
                 <div class="chat-header-info">
                     <h3>{{ active_contact.userprofile.nickname }}</h3>
@@ -147,18 +152,20 @@ document.addEventListener('DOMContentLoaded', function() {
     if (messagesContainer) {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
-    
-    // Close mobile sidebar when contact is selected
-    const contactItems = document.querySelectorAll('.contact-item');
-    contactItems.forEach(item => {
-        item.addEventListener('click', () => {
-            if (window.messenger && window.innerWidth <= 768) {
-                setTimeout(() => {
-                    window.messenger.closeMobileSidebar();
-                }, 100);
-            }
-        });
-    });
 });
+
+// Global functions for mobile navigation
+function toggleMobileSidebar() {
+    // In new architecture, this just shows contacts screen
+    if (window.messenger && window.messenger.isMobile) {
+        window.messenger.showContactsScreen();
+    }
+}
+
+function goBackToContacts() {
+    if (window.messenger) {
+        window.messenger.goBackToContacts();
+    }
+}
 </script>
 {% endblock %}
