@@ -1,0 +1,51 @@
+<!-- app/templates/app/login.html -->
+{% extends "app/base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<style>
+    body { 
+        background: linear-gradient(to right, #a6c0fe, #f68084);
+
+
+    }
+    .login-container {
+        max-width: 500px;
+        margin: 50px auto;
+        padding: 30px;
+        background: linear-gradient(to right, #a6c0fe, #f68084);
+
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+    .login-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .btn-custom-primary {
+        background: linear-gradient(to right, #ff9a9e, #fad0c4);
+
+        border-color: linear-gradient(to right, #ff9a9e, #fad0c4);
+        ;
+    }
+    .btn-custom-primary:hover {
+        background: linear-gradient(to right, #ff9a9e, #fad0c4);
+
+        border-color: linear-gradient(to right, #ff9a9e, #fad0c4);
+        ;
+    }
+</style>
+<div class="container mt-5">
+    <div class="login-container">
+        <div class="login-header">
+            <h2>Login</h2>
+        </div>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-custom-primary btn-lg btn-block">Login</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

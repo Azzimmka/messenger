@@ -1,0 +1,44 @@
+<!-- app/templates/app/contact_list.html -->
+{% extends "app/base.html" %}
+
+{% block content %}
+<style>
+body {
+    background: linear-gradient(to right, #a6c0fe, #f68084);
+
+
+}
+</style>
+<div class="container mt-5">
+    <h2>Контакты</h2>
+
+    <!-- Форма для добавления контакта -->
+    <div class="mb-4">
+
+        <form method="post" action="{% url 'add_contact' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <select name="contact_user" class="form-control" required>
+                    <option value="" disabled selected>Select user</option>
+                    {% for user in all_users %}
+                        <option value="{{ user.id }}">{{ user.username }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Добавить контакт</button>
+        </form>
+    </div>
+
+    <!-- Список контактов -->
+    <ul class="list-group">
+        {% for contact in contacts %}
+            <li class="list-group-item">
+                {{ contact.contact_user.username }}
+                <!-- Вы можете добавить сюда дополнительные элементы, такие как кнопки для удаления контакта -->
+            </li>
+        {% empty %}
+            <li class="list-group-item">No contacts found.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

@@ -1,0 +1,91 @@
+<!-- app/templates/app/message_list.html -->
+{% extends "app/base.html" %}
+
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(to right, #a6c0fe, #f68084);
+
+    }
+    .message-timestamp {
+        display: inline-block;
+        margin-left: 20px; /* Отступ слева */
+        font-size: 0.8em; /* Размер шрифта */
+        color: #ccc; /* Цвет текста */
+    }
+
+    .message-content {
+        display: inline-block;
+        margin-right: 20px; /* Отступ справа */
+    }
+
+    .message-sender {
+        display: inline-block;
+        margin-right: 20px; /* Отступ справа */
+        font-weight: bold; /* Жирный шрифт */
+    }
+</style>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-4">
+            <h2>Контакты</h2>
+            <div class="list-group">
+                {% for contact in contact_list %}
+                <a href="{% url 'message_list' %}?contact_id={{ contact.id }}" class="list-group-item list-group-item-action {% if contact.id == selected_contact.id %}active{% endif %}">
+                    <span class="avatar" style="padding-left: 6px; padding-top: 3px;">🐣</span>
+                    {{ contact.username }}
+                </a>
+                {% empty %}
+                    <p>No contacts available.</p>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-8">
+            {% if contact_user %}
+            <h2>Чат с {{ contact_user.username }}</h2>
+            <div class="chat-messages">
+                <h4>Отправленные сообщения</h4>
+
+
+                {% for message in messages_sent %}
+                <div class="message sent">
+                    <p>
+                        <span class="message-sender">Я:</span>
+                        <span class="message-content">{{ message.content }}</span>
+                        <span class="message-timestamp">{{ message.timestamp|date:"d M Y H:i" }}</span>
+                    </p>
+                </div>
+                {% empty %}
+                <p>No sent messages.</p>
+                {% endfor %}
+                <h4>Полученные сообщения</h4>
+                {% for message in messages_received %}
+                <div class="message received">
+                    <p>
+                        <span class="message-sender">{{ message.sender.username }}:</span>
+                        <span class="message-content">{{ message.content }}</span>
+                        <span class="message-timestamp">{{ message.timestamp|date:"d M Y H:i" }}</span>
+                    </p>
+                </div>
+                {% empty %}
+                <p>No received messages.</p>
+                {% endfor %}
+            </div>
+
+            <div class="chat-footer mt-4" style="background: linear-gradient(to right, #a6c0fe, #f68084); border-radius: 20px;">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <textarea name="content" class="form-control" rows="3" placeholder="Type a message..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Send</button>
+                </form>
+            </div>
+            {% else %}
+            <p>Выберите контакт, чтобы начать общение. 😁</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

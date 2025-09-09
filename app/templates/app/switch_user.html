@@ -1,0 +1,26 @@
+<!-- messenger/templates/messenger/switch_user.html -->
+
+{% extends 'app/base.html' %}
+
+{% block title %}Switch User{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(to right, #a6c0fe, #f68084);
+    }
+</style>
+<h1>Switch User</h1>
+<form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" name="username" id="username" class="form-control">
+    </div>
+    <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password" class="form-control">
+    </div>
+    <button type="submit" class="btn btn-primary">Switch</button>
+</form>
+{% endblock %}

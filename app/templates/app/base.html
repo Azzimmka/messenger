@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Web Messenger{% endblock %}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .navbar {
+            background: linear-gradient(to right, #a6c0fe, #f68084);
+            color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.5rem;
+        }
+        .navbar-nav .nav-link {
+            color: #ffffff !important;
+        }
+        .navbar-nav .nav-link:hover {
+            color: #dbe3e9 !important;
+        }
+        .sidebar {
+            height: 100vh;
+            width: 250px;
+            background: linear-gradient(to right, #a6c0fe, #f68084);
+            color: #ffffff;
+            position: fixed;
+            top: 0;
+            left: 0;
+            overflow-y: auto;
+            padding-top: 20px;
+            border-right: 2px solid #007ab8;
+        }
+        .sidebar .nav-link {
+            color: #ffffff;
+            padding: 15px 20px;
+            font-weight: 500;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+        .sidebar .nav-link:hover {
+
+            background: linear-gradient(to right, #ff9a9e, #fad0c4); border-radius: 70px;
+        }
+        .sidebar .nav-link.active {
+            background: linear-gradient(to right, #ff9a9e, #fad0c4); border-radius: 70px;
+
+        }
+        .sidebar .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        .chat-header {
+            background: linear-gradient(to right, #ff9a9e, #fad0c4); border-radius: 70px;
+
+            color: #ffffff;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid #007ab8;
+        }
+        .chat-header .user-info {
+            display: flex;
+            align-items: center;
+        }
+        .chat-header .user-info .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+        .chat-header .user-info .username {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        .chat-footer {
+            background: linear-gradient(to right, #6a11cb 0%, #2575fc 100%);
+
+            color: #ffffff;
+            padding: 10px 20px;
+            background: linear-gradient(to right, #6a11cb 0%, #2575fc 100%);
+
+        }
+        .btn-primary {
+            background-color: #006c8b;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #005b77;
+        }
+    </style>
+</head>
+<body>
+
+
+    <div class="sidebar">
+        <div class="container">
+            <div class="nav flex-column">
+                {% if user.is_authenticated %}
+                <a class="nav-link {% if request.path == '/contacts/' %}active{% endif %}" href="{% url 'contact_list' %}">
+                    <i class="fas fa-address-book"></i>
+                    <span class="ml-2">Contacts</span>
+                </a>
+                <a class="nav-link {% if request.path == '/messages/' %}active{% endif %}" href="{% url 'message_list' %}">
+                    <i class="fas fa-comments"></i>
+                    <span class="ml-2">Messages</span>
+                </a>
+                <a class="nav-link" href="{% url 'logout' %}">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="ml-2">Logout</span>
+                </a>
+                <a class="nav-link" href="{% url 'switch_user' %}">
+                    <i class="fas fa-sync-alt"></i>  <!-- Логотип для Switch User -->
+                    <span class="ml-2">Switch User</span>
+                </a>
+                
+                {% else %}
+                <a class="nav-link" href="{% url 'login' %}">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span class="ml-2">Login</span>
+                </a>
+                <a class="nav-link" href="{% url 'register' %}">
+                    <i class="fas fa-user-plus"></i>
+                    <span class="ml-2">Register</span>
+                </a>
+                
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

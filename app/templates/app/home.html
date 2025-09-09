@@ -1,0 +1,43 @@
+<!-- messenger/templates/messenger/home.html -->
+{% extends "app/base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(to right, #a6c0fe, #f68084);
+    }
+    .jumbotron-custom {
+        background: linear-gradient(to right, #a6c0fe, #f68084);
+        color: white;
+        padding: 50px 30px;
+        border-radius: 80px;
+        margin-top: 100px;
+    }
+    .jumbotron-custom h1 {
+        font-size: 3em;
+        font-weight: bold;
+    }
+    .jumbotron-custom p.lead {
+        font-size: 1.5em;
+        margin-bottom: 30px;
+    }
+    .btn-custom-primary {
+        background-color: #2575fc;
+        border-color: #2575fc;
+    }
+    .btn-custom-secondary {
+        background-color: #6a11cb;
+        border-color: #6a11cb;
+    }
+</style>
+<div class="jumbotron jumbotron-custom text-center">
+    <h1 class="display-4">Добро пожаловать Web Messenger</h1>
+    <p class="lead">Общайтесь с друзьями и семьей.</p>
+    <hr class="my-4">
+    <p>Если у вас уже есть учетная запись, пожалуйста, войдите в систему. Если нет, смело зарегистрируйтесь.</p>
+    <a class="btn btn-custom-primary btn-lg text-white" href="{% url 'login' %}" role="button">Log In</a>
+    <a class="btn btn-custom-secondary btn-lg text-white" href="{% url 'register' %}" role="button">Register</a>
+</div>
+{% endblock %}
